@@ -14,16 +14,20 @@ object Metascore {
     * Convert:
     *
     * {
-    *   ..
-    *   ..
-    *   "Metascore": "75",
-    *   ..
-    *   ..
+    * ..
+    * ..
+    * "Metascore": "75",
+    * ..
+    * ..
     * }
     *
     * into:
     *
     * `Metascore(75)`
     */
-    implicit val decoderMetascore: Decoder[Metascore] = Decoder { metascore => ??? }
+  implicit val decoderMetascore: Decoder[Metascore] = Decoder { metascore =>
+    for {
+      value <- metascore.downField("Metascore").as[Int]
+    } yield Metascore(value)
+  }
 }

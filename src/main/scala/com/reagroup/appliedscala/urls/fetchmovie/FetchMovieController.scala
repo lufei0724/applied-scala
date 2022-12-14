@@ -3,6 +3,7 @@ package com.reagroup.appliedscala.urls.fetchmovie
 import cats.effect.IO
 import com.reagroup.appliedscala.models._
 import com.reagroup.appliedscala.urls.ErrorHandler
+import io.circe.Json
 import io.circe.syntax._
 import org.http4s._
 import org.http4s.circe.CirceEntityCodec._
@@ -19,7 +20,13 @@ class FetchMovieController(fetchMovie: MovieId => IO[Option[Movie]]) extends Htt
     * Hint: You can use `NotFound()` to construct a 404 and `Ok()` to construct a 200.
     * Delegate the error case to the `ErrorHandler`.
     */
-  def fetch(movieId: Long): IO[Response[IO]] =
-    ???
+  def fetch(movieId: Long): IO[Response[IO]] = for {
+    errorOrMovie <- fetchMovie(MovieId(movieId)).attempt
+    resp <- errorOrMovie match {
+      case Right(Some(movie)) => Ok(movie.asJson)
+      case Right(None) => NotFound()
+      case Left(e) => ErrorHandler(e)
+    }
+  } yield resp
 
 }
