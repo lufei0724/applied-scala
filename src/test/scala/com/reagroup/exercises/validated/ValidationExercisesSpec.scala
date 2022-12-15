@@ -71,6 +71,13 @@ class ValidationExercisesSpec extends Specification {
       val errsOrPeople = validatePeople(inputs)
       errsOrPeople must_=== Invalid(NonEmptyList.of(NameIsEmpty("lastName"), PasswordTooWeak, PasswordTooShort, NameIsEmpty("firstName")))
     }
+
+    "return all errors if there is any" in {
+      val inputs = List(("jimm", "smith", "hunter1234567"), ("jimm", "", ""), ("", "smith", "abcc33332"))
+
+      val errsOrPeople = validatePeople(inputs)
+      errsOrPeople must_=== Invalid(NonEmptyList.of(NameIsEmpty("lastName"), PasswordTooWeak, PasswordTooShort, NameIsEmpty("firstName")))
+    }
   }
 
 }
