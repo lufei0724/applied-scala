@@ -18,7 +18,15 @@ class SaveMovieController(saveNewMovie: NewMovieRequest => IO[ValidatedNel[Movie
     * 3. Pattern match and convert every case into an HTTP response. To Pattern match on `Validated`, use `Invalid` and `Valid`.
     * Hint: Use `Created(...)` to return a 201 response when the movie is successfully saved and `BadRequest(...)` to return a 403 response when there are errors.
     */
-  def save(req: Request[IO]): IO[Response[IO]] =
-    ???
+  def save(req: Request[IO]): IO[Response[IO]] = for {
+    errorOrNewMovieRequest <- req.as[NewMovieRequest].attempt
+    resp <- errorOrNewMovieRequest match {
+      case Left(_) => BadRequest("Invalid request body")
+      case Right(newMovieRequest: NewMovieRequest) => saveNewMovie(newMovieRequest).flatMap {
+        case Invalid(e) => BadRequest(e)
+        case Valid(movieId) => Created(movieId)
+      }
+    }
+  } yield resp
 
 }

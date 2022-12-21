@@ -81,4 +81,35 @@ class SaveMovieControllerSpec extends Specification {
 
   }
 
+  "when saving an invalid request body" should {
+
+    val invalidJson =
+      json"""
+        {
+          "movieName": "",
+          "synopsis": ""
+        }
+      """
+
+    val request = Request[IO](method = Method.POST).withEntity(invalidJson.noSpaces)
+
+    val saveNewMovie = (_: NewMovieRequest) => ???
+
+    val controller = new SaveMovieController(saveNewMovie)
+
+    val actual = controller.save(request).unsafeRunSync()
+
+    "return status code BadRequest" in {
+
+      actual.status must beEqualTo(Status.BadRequest)
+
+    }
+
+    "return errors in response body" in {
+      val expectedResult = "\"Invalid request body\""
+      actual.as[String].unsafeRunSync() must beEqualTo(expectedResult)
+    }
+
+  }
+
 }
