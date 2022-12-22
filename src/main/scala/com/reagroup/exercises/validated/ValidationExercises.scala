@@ -90,7 +90,7 @@ object ValidationExercises {
   type Password = String
 
   def validatePeople(inputs: List[(FirstName, LastName, Password)]): ValidatedNel[ValidationError, List[Person]] = {
-    inputs.foldLeft[ValidatedNel[ValidationError, List[Person]]](Validated.validNel(List[Person]())) {
+    inputs.foldLeft[ValidatedNel[ValidationError, Vector[Person]]](Validated.validNel(Vector[Person]())) {
       case (validatedList, (firstName, lastName, password)) => {
         val validatedPerson = validatePerson(firstName, lastName, password)
         (validatedList, validatedPerson) match {
@@ -100,7 +100,7 @@ object ValidationExercises {
           case (Invalid(e1), Invalid(e2)) => Invalid(e1 concatNel e2)
         }
       }
-    }
+    }.map(_.toList)
   }
 
 }
