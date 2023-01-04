@@ -16,7 +16,7 @@ class SaveMovieService(saveMovie: ValidatedMovie => IO[MovieId]) {
     val errorsOrValidatedMovie = NewMovieValidator.validate(newMovieReq)
     errorsOrValidatedMovie match {
       case Valid(validatedMovie) => saveMovie(validatedMovie).map(_.valid)
-      case Invalid(e) => IO.pure(Invalid(e))
+      case Invalid(e) => IO.pure(e.invalid)
     }
   }
 }
